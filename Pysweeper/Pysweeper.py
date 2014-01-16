@@ -1,26 +1,25 @@
 import random
+import sys
 
-width = 15
-height = 7
-
-mine_no = 10
+width = 1
+height = 1
+mine_no = 0
 
 filled_board = []
 player_board = []
 
-statrow = "   " + ("--- "*width)+" "
-
 def printBoard():
+    static_row = "   " + ("--- "*width)+" "
     print()
     letters = "abcdefghijklmnopqrstuvwxyz"[:width]
     print("    " + ''.join(map(lambda x: x+"   ", letters)))
     for i in range(height):
-        print(statrow)
+        print(static_row)
         dynrow =  str(i) + " |"
         for j in range(width):
             dynrow += " " + filled_board[j][i] + " |"
         print(dynrow)
-    print(statrow)
+    print(static_row)
 
 def genBoard():
     placed = []
@@ -45,7 +44,54 @@ def genBoard():
                 temp_board[n[0]][n[1]] = str(prev+1)
     filled_board[:] = temp_board
 
-genBoard()
-printBoard()
+def run():
+    # Get input for size and no of mines
+    try:
+        print("Height:")
+        inp = input("-> ")
+        i = int(inp)
+        if i < 1:
+            print("Must be larger than 0")
+            return
+        else:
+            global height
+            height = int(inp)
+    except ValueError:
+        print("Could not convert data to an integer.")
+        return
+
+    try:
+        print("Width:")
+        inp = input("-> ")
+        i = int(inp)
+        if i < 1:
+            print("Must be larger than 0")
+            return
+        else:
+            global width
+            width = int(inp)
+    except ValueError:
+        print("Could not convert data to an integer.")
+        return
+
+    try:
+        print("Number of mines:")
+        inp = input("-> ")
+        i = int(inp)
+        if 0 < i < (height*width):
+            global mine_no
+            mine_no = int(inp)
+        else:
+            print("Must be larger than 0 and smaller than the total number of squares")
+            return
+    except ValueError:
+        print("Could not convert data to an integer.")
+        return
+
+    print("Generating board...", height, width, mine_no)
+    genBoard()
+    printBoard()
 
 
+if __name__ == '__main__':
+    run()
