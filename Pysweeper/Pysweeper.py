@@ -10,7 +10,7 @@ def getParams():
         i = int(inp)
         if i < 1:
             print("Must be larger than 0")
-            return [-1, -1, -1]
+            return [None, None, None]
         else:
             h = int(inp)
 
@@ -19,7 +19,7 @@ def getParams():
         i = int(inp)
         if i < 1:
             print("Must be larger than 0")
-            return [-1, -1, -1]
+            return [None, None, None]
         else:
             w = int(inp)
 
@@ -30,13 +30,13 @@ def getParams():
             m_no = int(inp)
         else:
             print("Must be larger than 0 and smaller than the total number of squares")
-            return [-1, -1, -1]
+            return [None, None, None]
 
         return [h, w, m_no]
 
     except ValueError:
         print("Could not convert data to an integer.")
-        return [-1, -1, -1]
+        return [None, None, None]
 
 def run():
     """Run the game"""
@@ -45,17 +45,15 @@ def run():
     height = None
     mine_no = None
 
-    [height, width, mine_no] = getParams()
-
-    while height == -1:
+    while height == None:
         [height, width, mine_no] = getParams()
         
     print("Generating board...", height, width, mine_no)
     field = Board.Board(height, width, mine_no)
 
-    game_active = True
+    game_status = "running"
     first_move = True
-    while game_active:
+    while game_status == "running":
         field.printBoard()
         try:
             print("Next move:")
@@ -64,7 +62,7 @@ def run():
             nums = re.findall("[0-9]+", inp)
             if chars[0].lower() == "exit":
                 print("Quitting Pysweeper")
-                game_active = False
+                game_status = "quitting"
             elif chars[0].lower() == "flag" and len(nums) == 1 and len(chars) == 2 and chars[1] in "abcdefghijklmnopqrstuvwxyz"[:width] and int(nums[0]) in range(height):
                 if first_move:
                     print("Can't flag on first turn")
@@ -78,7 +76,7 @@ def run():
                 if first_move:
                     field.genBoard(x,y)
                     first_move = False
-                field.turnTile(x,y)
+                game_status = field.turnTile(x,y)
             else:
                 print("Invalid input")
         except ValueError:
@@ -86,6 +84,10 @@ def run():
         except IndexError:
             print("Invalid input")
 
+        if (field.gameFinished() and game_status == "running"):
+            game_status = "won"
+
+    print("Game ended with status " + game_status)
 
 if __name__ == '__main__':
     run()

@@ -59,22 +59,48 @@ class Board(object):
         print(static_row)
 
     def turnTile(self, x,y):
-        if self.player_board[x][y] != " " :
-            print("This tile has already been turned")
-        elif self.filled_board[x][y] == "0":
+        if self.filled_board[x][y] == "F": # turned a flag
+            print("This tile has been flagged")
+            return "running"
+        elif self.filled_board[x][y] == "*":  # turned a mine
+            print("Mine hit. Game Over")
+            self.player_board[x][y] = self.filled_board[x][y]
+            return "bombed"
+        elif self.filled_board[x][y] == "0": # turned a tile with 0 neighboring bombs
             #turn all neighbors
             self.player_board[x][y] = "-"
-            neighbors = [[x-1, y], [x, y-1], [x, y+1], [x+1, y]]
+            neighbors = [[x-1, y-1],[x-1, y],[x-1, y+1],
+                         [x,   y-1],         [x,   y+1],
+                         [x+1, y-1],[x+1, y],[x+1, y+1]]
+
             for n in neighbors:
                 if (n[0] in range(self.width)) and (n[1] in range(self.height)) and self.player_board[n[0]][n[1]] == " ":
                     self.turnTile(n[0],n[1])
+            return "running"
+        elif self.player_board[x][y] != " " :
+            print("This tile has already been turned")
+            return "running"
         else:
             self.player_board[x][y] = self.filled_board[x][y]
+            return "running"
         
     def flagTile(self, x,y):
-        if self.player_board[x][y] != " " :
-            print("This tile has already been turned")
-        elif self.player_board[x][y] == "F":
+        if self.player_board[x][y] == "F":
              self.player_board[x][y] = " "
+        elif self.player_board[x][y] != " " :
+            print("This tile has already been turned")
         else:
             self.player_board[x][y] = "F"
+
+    def gameFinished(self):
+        try:
+            for i in range(self.width):
+                for j in range(self.height):
+                    if self.player_board[i][j] == "F" and self.filled_board[i][j] != "*":
+                        return False
+                    elif self.player_board[i][j] == " " and self.filled_board[i][j] != "*":
+                        return False
+            return True
+        except IndexError:
+            print("index error for ", i,j)
+            return False
