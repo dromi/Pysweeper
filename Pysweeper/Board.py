@@ -1,7 +1,9 @@
 import random
+from colorama import Back, init, Fore
 
 class Board(object):
     """class for handling the playing field for the game"""
+    
 
     def __init__(self, h, w, m_no):
         self.height = h
@@ -9,6 +11,7 @@ class Board(object):
         self.mine_no = m_no
         self.filled_board = [["0" for col in range(self.height)] for row in range(self.width)]
         self.player_board = [[" " for col in range(self.height)] for row in range(self.width)]
+        init() #initialize colorama
 
     def genBoard(self, x, y):
         placed = []
@@ -36,19 +39,19 @@ class Board(object):
 
     def printBoard(self):
         """Print the players view of the field to stdout"""
-        static_row = "    " + ("--- "*self.width)+" "
+        static_row = "   " + Back.WHITE + Fore.BLACK + " " + ("--- "*self.width) + Back.RESET + Fore.RESET + " "
         print()
         letters = "abcdefghijklmnopqrstuvwxyz"[:self.width]
-        print("    " + ''.join(map(lambda x: x+"   ", letters)))
+        print("     " + ''.join(map(lambda x: x+"   ", letters)))
         for i in range(self.height):
             print(static_row)
+            dyn_row = ""
             if i < 10:
-                dynrow =  " " + str(i) + " |"
-            else:
-                dynrow =  str(i) + " |"
+                dyn_row +=  " "
+            dyn_row += str(i) + " " + Back.WHITE + Fore.BLACK +  "|" + Back.RESET + Fore.RESET
             for j in range(self.width):
-                dynrow += " " + self.player_board[j][i] + " |"
-            print(dynrow)
+                dyn_row += " " + self.player_board[j][i] + " " + Back.WHITE + Fore.BLACK + "|" + Back.RESET + Fore.RESET
+            print(dyn_row)
         print(static_row)
 
     def printSolution(self):
@@ -66,7 +69,7 @@ class Board(object):
         print(static_row)
 
     def turnTile(self, x,y):
-        if self.filled_board[x][y] == "F": # turned a flag
+        if self.player_board[x][y] == "F": # turned a flag
             print("This tile has been flagged")
             return "running"
         elif self.filled_board[x][y] == "*":  # turned a mine

@@ -1,75 +1,157 @@
 import os
 import re
 import random
+import platform
 
 import Board
 
-title = """
+title_text = """
 ,------.,--.   ,--.,---. ,--.   ,--.,------.,------.,------. ,------.,------.  
 |  .--. '\  `.'  /'   .-'|  |   |  ||  .---'|  .---'|  .--. '|  .---'|  .--. ' 
 |  '--' | '.    / `.  `-.|  |.'.|  ||  `--, |  `--, |  '--' ||  `--, |  '--'.' 
 |  | --'    |  |  .-'    |   ,'.   ||  `---.|  `---.|  | --' |  `---.|  |\  \  
 `--'        `--'  `-----''--'   '--'`------'`------'`--'     `------'`--' '--' 
+
+\t -The Game\n
  """
 
+clear_cmd = ''
+
+max_height = 30
+max_width = 26
+
+def findOS():
+     global clear_cmd 
+     if platform.system() == 'Windows':
+         clear_cmd = 'CLS'
+     elif platform.system() == 'Linux':
+         clear_cmd = 'clear'
+
+def title():
+    os.system(clear_cmd)
+    print(title_text)
+
+
+
+def help():
+    print("""Pysweeper. Like Minesweeper you know?..
+
+ - : Empty spot with no adjecent mines
+1-8: Indicates number of adjacent mines
+ F : Flagged spot
+ U : Wrongly placed flag
+ * : Mine
+ X : Exploded mine
+    """)
+    input("press enter")
+
+def options():
+    print("Graphical settings:\n")
+    print("1: ASCII           <---")
+    print("2: Fancy Fancy GUI")
+    inp = input("->")
+    if inp == "1":
+        title()
+        print("Good choice!\n")
+        input("press enter")
+    elif inp == "2":
+        title()
+        print("ERROR Only ASCII graphics avaliable (this is after all an ASCII game..)\n")
+        input("press enter")
+    else:
+        title()
+        print("ERROR! Bad input. No optioning for you\n")
+        input("press enter")
+
+
+
 def getParams():
-    print(title)
-    print("\t -The Game\n")
-    try:
-        print("Height:")
-        inp = input("-> ")
-        i = int(inp)
-        if i < 1:
-            os.system('CLS')
-            print("Must be larger than 0")
-            return [None, None, None]
-        else:
-            h = int(inp)
+    print("Input game parameters\n")
 
-        print("Width:")
-        inp = input("-> ")
-        i = int(inp)
-        if i < 1:
-            os.system('CLS')
-            print("Must be larger than 0")
-            return [None, None, None]
-        else:
-            w = int(inp)
+    height = None
+    width = None
+    mine_no = None
 
-        print("Number of mines:")
-        inp = input("-> ")
-        i = int(inp)
-        if 0 < i < (h*w-9):
-            m_no = int(inp)
-        else:
-            os.system('CLS')
-            print("Must be larger than 0 and smaller than the total number of squares minus 9")
-            return [None, None, None]
+    while(height == None):
+        try:
+            print("Height:")
+            inp = input("-> ")
+            i = int(inp)
+            if i < 1:
+                print("Must be larger than 0")
+            elif i > max_height:
+                print("Must be smaller than",max_height)
+            else:
+                height = int(inp)
+        except ValueError:
+            print("Could not convert data to an integer")
 
-        os.system('CLS')
-        return [h, w, m_no]
+    while(width == None):
+        try:
+            print("Width:")
+            inp = input("-> ")
+            i = int(inp)
+            if i < 1:
+                print("Must be larger than 0")
+            elif i > max_width:
+                print("Must be smaller than",max_width)
+            else:
+                width = int(inp)
+        except ValueError:
+            print("Could not convert data to an integer")
 
-    except ValueError:
-        os.system('CLS')
-        print("Could not convert data to an integer.")
-        return [None, None, None]
+    while(mine_no == None):
+        try:
+            print("Number of mines:")
+            inp = input("-> ")
+            i = int(inp)
+            if i < 1:
+                print("Must be larger than 0")
+            elif i > (height*width-9):
+                print("Must be smaller than",(height*width-9), "(total number of squares minus 9)")
+            else:
+                mine_no = int(inp)
+        except ValueError:
+            print("Could not convert data to an integer")
+
+    return [height, width, mine_no]
 
 
 def run():
     """Run the game"""
     # Get input for size and no of mines
-    width = None
-    height = None
-    mine_no = None
 
-    while height == None:
-        [height, width, mine_no] = getParams()
-        
-    print(title)
-    print("\t -The Game\n")
+    [height, width, mine_no] = getParams()
 
+    """
+    8 lines title
+    3 lines spacing and info
+    1 line letters
+    2 lines pr row
+    1 row final
+    2 lines user input
+    ==
+    14 + 2*rows
+    """
+    os.system("mode con lines=" + str(18+2*height)) #resize cmd window to fit field
+
+    """
+    3 numbers
+    4 pr col
+    1 final
+    4 for symetry
+    ==
+    4 + 4*cols
+    """
+
+    if width > 18:
+        os.system("mode con cols=" + str(7+4*width)) #resize cmd window to fit field
+    else:
+        os.system("mode con cols=80") #resize cmd window to default size
+
+    title()
     #print("Generating board...", height, width, mine_no)
-    print()
+    print() #print empty line for consistency
     field = Board.Board(height, width, mine_no)
 
     game_status = "running"
@@ -77,14 +159,12 @@ def run():
     while game_status == "running":
         field.printBoard()
         try:
-            print("Next move:")
+            print("\nNext move:")
             inp = input("-> ")
-            os.system('CLS')
-            print(title)
-            print("\t -The Game\n")
+            title()
             chars = re.findall("[a-zA-Z]+", inp)
             nums = re.findall("[0-9]+", inp)
-            if chars[0].lower() == "exit":
+            if chars[0].lower() in ["exit","quit"]:
                 game_status = "quitting"
             elif chars[0].lower() == "flag" and len(nums) == 1 and len(chars) == 2 and chars[1] in "abcdefghijklmnopqrstuvwxyz"[:width] and int(nums[0]) in range(height):
                 if first_move:
@@ -116,7 +196,7 @@ def run():
             game_status = "won"
 
     if(game_status == "won"):
-        print("Game won, gratiz!!")
+        print("Game won, gratz!!")
     elif(game_status == "bombed"):
         print(random.choice(["OOOhh you got served bro!",
                              "You are LITTERALY the bomb! Well done!",
@@ -131,38 +211,33 @@ def run():
     field.flipBoard()
     field.printBoard()
     input("press enter")
-    os.system('CLS')
+    os.system(clear_cmd)
 
 def menu():
     while(True):
-        print(title)
-        print("\t -The Game\n")
+        title()
         print("Please make your selection:\n")
         print("1: New Game")
         print("2: Options")
-        print("3: Quit\n")
+        print("3: Help")
+        print("4: Quit\n")
         inp = input("->")
+        title()
         if inp == "1":
-            os.system('CLS')
             run()
         elif inp == "2":
-            os.system('CLS')
-            print(title)
-            print("\t -The Game\n")
-            print("Nothing here.. yet")
-            input("press enter")
-            os.system('CLS')
+            options()
         elif inp == "3":
-            print("exiting")
+            help()
+        elif inp == "4":
+            print("exiting\n")
             return
         else:
-            os.system('CLS')
-            print(title)
-            print("\t -The Game\n")
-            print("Invalid input!")
+            print("Invalid input!\n")
             input("press enter")
-            os.system('CLS')
 
 if __name__ == '__main__':
+    #os.system("mode con lines=30") #resize cmd window
+    findOS()
     menu()
     #run()

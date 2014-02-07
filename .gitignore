@@ -38,3 +38,4 @@ nosetests.xml
 # Visual Studio stuff
 *.pyproj
 *.sln
+*.suo
