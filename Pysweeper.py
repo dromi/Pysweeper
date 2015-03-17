@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
 import re
 import random
@@ -5,7 +8,7 @@ import platform
 
 import Board
 
-title_text = """
+logo = """
 ,------.,--.   ,--.,---. ,--.   ,--.,------.,------.,------. ,------.,------.  
 |  .--. '\  `.'  /'   .-'|  |   |  ||  .---'|  .---'|  .--. '|  .---'|  .--. ' 
 |  '--' | '.    / `.  `-.|  |.'.|  ||  `--, |  `--, |  '--' ||  `--, |  '--'.' 
@@ -29,7 +32,7 @@ def findOS():
 
 def title():
     os.system(clear_cmd)
-    print(title_text)
+    print(logo)
 
 
 
