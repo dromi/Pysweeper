@@ -32,7 +32,7 @@ def options():
     p.setMsg("Options:")
     p.pushToBody("Graphical settings:\n")
     p.pushToBody("1: ASCII              <---")
-    p.pushToBody("2: Fancy Fancy GUI")
+    p.pushToBody("2: Fancy Fancy GUI ")
     p.flush()
     inp = p.getUserInput()
     if inp == "1":
