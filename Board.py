@@ -1,5 +1,6 @@
 import random
-from colorama import Back, init, Fore
+
+import util
 
 class Board(object):
     """class for handling the playing field for the game"""
@@ -11,7 +12,6 @@ class Board(object):
         self.mine_no = m_no
         self.filled_board = [["0" for col in range(self.height)] for row in range(self.width)]
         self.player_board = [[" " for col in range(self.height)] for row in range(self.width)]
-        init() #initialize colorama
         self.empty = True
 
     def genBoard(self, x, y):
@@ -43,18 +43,21 @@ class Board(object):
     def getBoard(self):
         """Returns the players view of the field"""
         view = ""
-        static_row = "   " + Back.WHITE + Fore.BLACK + " " + ("--- "*self.width) + Back.RESET + Fore.RESET + " \n"
-        # print()
-        letters = "abcdefghijklmnopqrstuvwxyz"[:self.width]
-        view += ("     " + ''.join(map(lambda x: x+"   ", letters)) + "\n")
+        static_row = "  " + util.colorize((" "+"--- "*self.width),"grey","white") + " \n"
+
+        if(self.width <= 10):
+            view += ("    " + ''.join(map(lambda x: str(x)+"   ", range(self.width))) + "\n")
+        else:
+            view += "    " + ''.join(map(lambda x: str(x)+"   ", range(10)))[:-1]
+            view += ''.join(map(lambda x: str(x)+"  ", range(10,self.width)))
+            view += "\n"
+        letters = "abcdefghijklmnopqrstuvwxyz"[:self.height]
         for i in range(self.height):
             view += static_row
             dyn_row = ""
-            if i < 10:
-                dyn_row +=  " "
-            dyn_row += str(i) + " " + Back.WHITE + Fore.BLACK +  "|" + Back.RESET + Fore.RESET
+            dyn_row += letters[i] + " " + util.colorize("|","grey","white")
             for j in range(self.width):
-                dyn_row += " " + self.player_board[j][i] + " " + Back.WHITE + Fore.BLACK + "|" + Back.RESET + Fore.RESET
+                dyn_row += util.colorByContent(self.player_board[j][i]) + util.colorize("|","grey","white")
             view += dyn_row + "\n"
         view += static_row
         return view
@@ -114,20 +117,3 @@ class Board(object):
                     self.player_board[i][j] = "*"
                 if self.player_board[i][j] == "F" and not self.filled_board[i][j] == "*":
                     self.player_board[i][j] = "U"
-
-
-
-
-    # def printSolution(self):
-    #     """Print the solution of the field to stdout"""
-    #     static_row = "   " + ("--- "*self.width)+" "
-    #     print()
-    #     letters = "abcdefghijklmnopqrstuvwxyz"[:self.width]
-    #     print("    " + ''.join(map(lambda x: x+"   ", letters)))
-    #     for i in range(self.height):
-    #         print(static_row)
-    #         dynrow =  str(i) + " |"
-    #         for j in range(self.width):
-    #             dynrow += " " + self.filled_board[j][i] + " |"
-    #         print(dynrow)
-    #     print(static_row)

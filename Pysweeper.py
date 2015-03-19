@@ -60,6 +60,7 @@ def main_menu():
             if i == 1:
                 controller.setGameMode()
                 controller.run()
+                controller.reset()
             elif i == 2:
                 options()
             elif i == 3:

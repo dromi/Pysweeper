@@ -66,8 +66,3 @@ class ASCIIPrinter(object):
         """Wait for user confirmation"""
         input(self.default_confirm)
 
-# p = ASCIIPrinter()
-
-# p.setMsg("this is the new shit")
-
-# p.flush()
