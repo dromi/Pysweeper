@@ -44,8 +44,13 @@ class ASCIIPrinter(object):
         self.msg = '\n'.join(msg_split)
 
     def pushToBody(self, text):
-        """Add a content to the body field"""
+        """Add content to the body field"""
         self.body += (text + "\n")
+
+    def print(self, text):
+        """Add content to the body field and flush"""
+        self.body = (text + "\n")
+        self.flush()
 
     def reset(self):
         """Reset view default"""

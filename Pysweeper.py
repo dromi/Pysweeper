@@ -39,7 +39,7 @@ def title():
 
 
 def help():
-    p.pushToBody("""\
+    p.print("""\
 Pysweeper. Like Minesweeper you know?..
 
   - : Empty spot with no adjecent mines
@@ -49,7 +49,6 @@ Pysweeper. Like Minesweeper you know?..
   * : Mine
   X : Exploded mine\
 """)
-    p.flush()
     p.getUserConfirm()
 
 def options():
@@ -60,16 +59,13 @@ def options():
     p.flush()
     inp = p.getUserInput()
     if inp == "1":
-        p.pushToBody("Good choice!\n")
-        p.flush()
+        p.print("Good choice!\n")
         p.getUserConfirm()
     elif inp == "2":
-        p.pushToBody("ERROR Only ASCII graphics avaliable (this is after all an ASCII game..)\n")
-        p.flush()
+        p.print("ERROR Only ASCII graphics avaliable (this is after all an ASCII game..)\n")
         p.getUserConfirm()
     else:
-        p.pushToBody("ERROR! Bad input. No optioning for you\n")
-        p.flush()
+        p.print("ERROR! Bad input. No optioning for you\n")
         p.getUserConfirm()
 
 def getParams():
@@ -152,19 +148,19 @@ def run():
     # else:
     #     os.system("mode con cols=80") #resize cmd window to default size
 
-    title()
+    # title()
     #print("Generating board...", height, width, mine_no)
-    print() #print empty line for consistency
+    # print() #print empty line for consistency
     field = Board.Board(height, width, mine_no)
 
     game_status = "first_move"
+    p.setMsg("Make your first move:")
     while game_status in ["running","first_move"]:
-        field.printBoard()
+        p.print(field.getBoard())
         try:
-            print("\n gamestatus:",game_status)
-            print("\nNext move:")
-            inp = input("-> ")
-            title()
+            # print("\nNext move:")
+            inp = p.getUserInput()
+            # title()
             chars = re.findall("[a-zA-Z]+", inp)
             nums = re.findall("[0-9]+", inp)
             if chars[0].lower() in ["exit","quit"]:
@@ -180,18 +176,16 @@ def run():
                 x = alphabet.index(chars[0])
                 y = int(nums[0])
                 if game_status == "first_move":
-                    print("creating board")
                     field.genBoard(x,y)
                 game_status = field.turnTile(x,y)
-                print("current status:",game_status)
             else:
                  raise ValueError("Invalid or no input")
         except ValueError as e:
-            print("ValueError occured:", e)
+            p.setMsg("ValueError occured: " + str(e))
         except IndexError as e:
-            print("IndexError occured:", e)
+            p.setMsg("IndexError occured: " + str(e))
         except IOError as e:
-            print("IOError occured:", e)
+            p.setMsg("IOError occured: " + str(e))
         
         # if game_status == "running_p":
         #     if not field.gameFinished():
@@ -202,22 +196,21 @@ def run():
         #     game_status = "won"
 
     if(game_status == "won"):
-        print("Game won, gratz!!")
+        p.setMsg("Game won, gratz!!")
     elif(game_status == "bombed"):
-        print(random.choice(["OOOhh you got served bro!",
-                             "You are LITTERALY the bomb! Well done!",
-                             "You blew up.. does that make you feel any better about yourself?",
-                             "You got your silly arse bombed"]))
+        p.setMsg(random.choice(["OOOhh you got served bro!",
+                                "You are LITTERALY the bomb! Well done!",
+                                "You blew up.. does that make you feel any better about yourself?",
+                                "You got your silly arse bombed"]))
     elif(game_status == "quitting"):
-       print("Quitting game.. you quitter!")
-       if game_status == "first_move":
-           field.genBoard(random.randint(0,width-1), random.randint(0,height-1))
+        p.setMsg("Quitting game.. you quitter!")
+        if field.empty:
+            field.genBoard(random.randint(0,width-1), random.randint(0,height-1))
     else:
-        print("unexpected game endning:", game_status)
+        p.setMsg("unexpected game endning:", game_status)
     field.flipBoard()
-    field.printBoard()
-    input("press enter")
-    os.system(clear_cmd)
+    p.print(field.getBoard())
+    p.getUserConfirm()
 
 def main_menu():
     while(True):
@@ -235,17 +228,14 @@ def main_menu():
         elif inp == "3":
             help()
         elif inp == "4":
-            p.pushToBody("Exiting..")
-            p.flush()
+            p.print("Exiting..")
             return
         else:
-            p.pushToBody("Invalid input!")
-            p.flush()
+            p.print("Invalid input!")
             p.getUserConfirm()
 
 if __name__ == '__main__':
     #os.system("mode con lines=30") #resize cmd window
-    findOS()
     p = ASCIIPrinter.ASCIIPrinter()
     main_menu()
     #run()

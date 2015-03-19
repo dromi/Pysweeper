@@ -12,8 +12,10 @@ class Board(object):
         self.filled_board = [["0" for col in range(self.height)] for row in range(self.width)]
         self.player_board = [[" " for col in range(self.height)] for row in range(self.width)]
         init() #initialize colorama
+        self.empty = True
 
     def genBoard(self, x, y):
+        self.empty = False        
         placed = []
         # Make sure quadrant surrounding first move is free
         sacred = [[x-1, y-1],[x-1, y],[x-1, y+1],
@@ -38,22 +40,24 @@ class Board(object):
                     old_val = int(self.filled_board[n[0]][n[1]])
                     self.filled_board[n[0]][n[1]] = str(old_val+1)
 
-    def printBoard(self):
-        """Print the players view of the field to stdout"""
-        static_row = "   " + Back.WHITE + Fore.BLACK + " " + ("--- "*self.width) + Back.RESET + Fore.RESET + " "
-        print()
+    def getBoard(self):
+        """Returns the players view of the field"""
+        view = ""
+        static_row = "   " + Back.WHITE + Fore.BLACK + " " + ("--- "*self.width) + Back.RESET + Fore.RESET + " \n"
+        # print()
         letters = "abcdefghijklmnopqrstuvwxyz"[:self.width]
-        print("     " + ''.join(map(lambda x: x+"   ", letters)))
+        view += ("     " + ''.join(map(lambda x: x+"   ", letters)) + "\n")
         for i in range(self.height):
-            print(static_row)
+            view += static_row
             dyn_row = ""
             if i < 10:
                 dyn_row +=  " "
             dyn_row += str(i) + " " + Back.WHITE + Fore.BLACK +  "|" + Back.RESET + Fore.RESET
             for j in range(self.width):
                 dyn_row += " " + self.player_board[j][i] + " " + Back.WHITE + Fore.BLACK + "|" + Back.RESET + Fore.RESET
-            print(dyn_row)
-        print(static_row)
+            view += dyn_row + "\n"
+        view += static_row
+        return view
 
     def turnTile(self, x,y):
         if self.player_board[x][y] == "F": # turned a flag
