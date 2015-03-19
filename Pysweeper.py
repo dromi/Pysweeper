@@ -9,36 +9,13 @@ import platform
 import Board
 import ASCIIPrinter
 
-logo = """
-,------.,--.   ,--.,---. ,--.   ,--.,------.,------.,------. ,------.,------.  
-|  .--. '\  `.'  /'   .-'|  |   |  ||  .---'|  .---'|  .--. '|  .---'|  .--. ' 
-|  '--' | '.    / `.  `-.|  |.'.|  ||  `--, |  `--, |  '--' ||  `--, |  '--'.' 
-|  | --'    |  |  .-'    |   ,'.   ||  `---.|  `---.|  | --' |  `---.|  |\  \  
-`--'        `--'  `-----''--'   '--'`------'`------'`--'     `------'`--' '--' 
-
-\t -The Game\n
-"""
-
-clear_cmd = ''
-
 max_height = 30
 max_width = 26
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-def findOS():
-    global clear_cmd 
-    if platform.system() == 'Windows':
-        clear_cmd = 'CLS'
-    elif platform.system() == 'Linux':
-        clear_cmd = 'clear'
-
-def title():
-    os.system(clear_cmd)
-    print(logo)
-
-
 def help():
+    p.setMsg("Help:")
     p.print("""\
 Pysweeper. Like Minesweeper you know?..
 
@@ -118,8 +95,8 @@ def getParams():
 
 def run():
     """Run the main game loop"""
-    # Get input for size and no of mines
 
+    # Get input for size and no of mines
     [height, width, mine_no] = getParams()
 
     """
@@ -148,9 +125,6 @@ def run():
     # else:
     #     os.system("mode con cols=80") #resize cmd window to default size
 
-    # title()
-    #print("Generating board...", height, width, mine_no)
-    # print() #print empty line for consistency
     field = Board.Board(height, width, mine_no)
 
     game_status = "first_move"
@@ -158,9 +132,7 @@ def run():
     while game_status in ["running","first_move"]:
         p.print(field.getBoard())
         try:
-            # print("\nNext move:")
             inp = p.getUserInput()
-            # title()
             chars = re.findall("[a-zA-Z]+", inp)
             nums = re.findall("[0-9]+", inp)
             if chars[0].lower() in ["exit","quit"]:
@@ -186,14 +158,6 @@ def run():
             p.setMsg("IndexError occured: " + str(e))
         except IOError as e:
             p.setMsg("IOError occured: " + str(e))
-        
-        # if game_status == "running_p":
-        #     if not field.gameFinished():
-        #         print("") #print empty line for consistency
-        #     game_status = "running"
-
-        # if (field.gameFinished() and game_status == "running"):
-        #     game_status = "won"
 
     if(game_status == "won"):
         p.setMsg("Game won, gratz!!")
@@ -238,4 +202,3 @@ if __name__ == '__main__':
     #os.system("mode con lines=30") #resize cmd window
     p = ASCIIPrinter.ASCIIPrinter()
     main_menu()
-    #run()
